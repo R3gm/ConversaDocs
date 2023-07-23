@@ -1,0 +1,14 @@
+transformers
+numpy
+torch
+pypdf
+langchain==0.0.240
+langchain[docarray]
+tiktoken
+sentence_transformers
+chromadb
+huggingface_hub
+unstructured[local-inference]
+gradio==3.35.2
+param==1.13.0
+openai

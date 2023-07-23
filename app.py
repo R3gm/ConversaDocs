@@ -57,8 +57,6 @@ description = """
 
 - This application works on both CPU and GPU. For fast inference with GGML models, use the GPU.
 
-- You can clone the 'space' but to make it work, you need to set My_hf_token in secrets with a valid huggingface [token](https://huggingface.co/settings/tokens) 
-
 - For more information about what GGML models are, you can visit this notebook [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/R3gm/InsightSolver-Colab/blob/main/LLM_Inference_with_llama_cpp_python__Llama_2_13b_chat.ipynb)
 """
 
@@ -128,8 +126,8 @@ with gr.Blocks(theme=theme, css=css) as demo:
     
   with gr.Tab("Change model"):
     gr.HTML("<h3>Only models from the GGML library are accepted.</h3>")
-    repo_ = gr.Textbox(label="Repository" ,value="TheBloke/Llama-2-7B-Chat-GGML")
-    file_ = gr.Textbox(label="File name" ,value="llama-2-7b-chat.ggmlv3.q2_K.bin")
+    repo_ = gr.Textbox(label="Repository" ,value="TheBloke/Llama-2-13B-chat-GGML")
+    file_ = gr.Textbox(label="File name" ,value="llama-2-13b-chat.ggmlv3.q4_1.bin")
     max_tokens = gr.inputs.Slider(1, MAX_NEW_TOKENS, default=16, label="Max new tokens", step=1)
     temperature = gr.inputs.Slider(0.1, 1., default=0.2, label="Temperature", step=0.1)
     top_k = gr.inputs.Slider(0.01, 1., default=0.95, label="Top K", step=0.01)

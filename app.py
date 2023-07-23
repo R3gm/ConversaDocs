@@ -42,7 +42,7 @@ css="""
 
 title = """
 <div style="text-align: center;max-width: 1500px;">
-    <h3>Chat with Documents 📚 - Falcon, Llama-2</h3>
+    <h2>Chat with Documents 📚 - Falcon, Llama-2 and OpenAI</h2>
     <p style="text-align: center;">Upload txt, pdf, doc, docx, enex, epub, html, md, odt, ptt and pttx. 
     Wait for the Status to show Loaded documents, start typing your questions. Oficial Repository <a href="https://github.com/R3gm/ConversaDocs">ConversaDocs</a>.<br /></p>
 </div>
@@ -135,7 +135,7 @@ with gr.Blocks(theme=theme, css=css) as demo:
     top_k = gr.inputs.Slider(0.01, 1., default=0.95, label="Top K", step=0.01)
     top_p = gr.inputs.Slider(0, 100, default=50, label="Top P", step=1)
     repeat_penalty = gr.inputs.Slider(0.1, 100., default=1.2, label="Repeat penalty", step=0.1)
-    change_model_button = gr.Button("Load GGML Model")
+    change_model_button = gr.Button("Load Llama GGML Model")
     
     default_model = gr.HTML("<hr>Default Model</h2>")
     falcon_button = gr.Button("Load FALCON 7B-Instruct")

@@ -1,3 +1,13 @@
+try:
+  from llama_cpp import Llama
+except:
+  if torch.cuda.is_available():
+      print("CUDA is available on this system.")
+      os.system('CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir --verbose')
+  else:
+      print("CUDA is not available on this system.")
+      os.system('pip install llama-cpp-python')
+
 import gradio as gr
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
@@ -28,13 +38,6 @@ from conversadocs.bones import DocChat
 dc = DocChat()
 
 ##### GRADIO CONFIG ####
-
-if torch.cuda.is_available():
-    print("CUDA is available on this system.")
-    os.system('CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir --verbose')
-else:
-    print("CUDA is not available on this system.")
-    os.system('pip install llama-cpp-python')
 
 css="""
 #col-container {max-width: 1500px; margin-left: auto; margin-right: auto;}
@@ -71,7 +74,6 @@ def upload_file(files, max_docs):
 
 def predict(message, chat_history, max_k, check_memory):
         print(message)
-        print(check_memory)
         bot_message = dc.convchain(message, max_k, check_memory)
         print(bot_message)
         return "", dc.get_chats()
@@ -124,8 +126,8 @@ with gr.Blocks(theme=theme, css=css) as demo:
     clear_button.click(flag,[],[link_output]).then(dc.clr_history,[], [link_output]).then(lambda: None, None, chatbot, queue=False)
     upload_button.upload(flag,[],[file_output]).then(upload_file, [upload_button, max_docs], file_output).then(dc.clr_history,[], [link_output]).then(lambda: None, None, chatbot, queue=False)
     
-  with gr.Tab("Change model"):
-    gr.HTML("<h3>Only models from the GGML library are accepted.</h3>")
+  with gr.Tab("Config llama-2 model"):
+    gr.HTML("<h3>Only models from the GGML library are accepted. To apply the new configurations, please reload the model.</h3>")
     repo_ = gr.Textbox(label="Repository" ,value="TheBloke/Llama-2-7B-Chat-GGML")
     file_ = gr.Textbox(label="File name" ,value="llama-2-7b-chat.ggmlv3.q5_1.bin")
     max_tokens = gr.inputs.Slider(1, 2048, default=256, label="Max new tokens", step=1)
@@ -135,7 +137,12 @@ with gr.Blocks(theme=theme, css=css) as demo:
     repeat_penalty = gr.inputs.Slider(0.1, 100., default=1.2, label="Repeat penalty", step=0.1)
     change_model_button = gr.Button("Load Llama GGML Model")
     
-    default_model = gr.HTML("<hr>Default Model</h2>")
+    model_verify_ggml = gr.HTML("Loaded model Llama-2")
+
+  with gr.Tab("API Models"):
+
+    default_model = gr.HTML("<hr>Falcon Model</h2>")
+    hf_key = gr.Textbox(label="HF TOKEN", value="token...")
     falcon_button = gr.Button("Load FALCON 7B-Instruct")
 
     openai_gpt_model = gr.HTML("<hr>OpenAI Model gpt-3.5-turbo</h2>")
@@ -143,16 +150,16 @@ with gr.Blocks(theme=theme, css=css) as demo:
     openai_button = gr.Button("Load gpt-3.5-turbo")
 
     line_ = gr.HTML("<hr> </h2>")
-    model_verify = gr.HTML("Loaded model Falcon 7B-instruct")
+    model_verify = gr.HTML(" ")
 
   with gr.Tab("About"):
     description_md = gr.Markdown(description)
 
   msg.submit(predict,[msg, chatbot, max_docs, check_memory],[msg, chatbot]).then(convert,[],[sou])
 
-  change_model_button.click(dc.change_llm,[repo_, file_, max_tokens, temperature, top_p, top_k, repeat_penalty, max_docs],[model_verify])
+  change_model_button.click(dc.change_llm,[repo_, file_, max_tokens, temperature, top_p, top_k, repeat_penalty, max_docs],[model_verify_ggml])
 
-  falcon_button.click(dc.default_falcon_model, [], [model_verify])
+  falcon_button.click(dc.default_falcon_model, [hf_key], [model_verify])
   openai_button.click(clear_api_key, [api_key], [api_key, model_verify])
     
 demo.launch(share=True,  enable_queue=True)

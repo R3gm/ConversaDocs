@@ -126,8 +126,8 @@ with gr.Blocks(theme=theme, css=css) as demo:
     
   with gr.Tab("Change model"):
     gr.HTML("<h3>Only models from the GGML library are accepted.</h3>")
-    repo_ = gr.Textbox(label="Repository" ,value="TheBloke/Llama-2-13B-chat-GGML")
-    file_ = gr.Textbox(label="File name" ,value="llama-2-13b-chat.ggmlv3.q4_1.bin")
+    repo_ = gr.Textbox(label="Repository" ,value="TheBloke/Llama-2-7B-Chat-GGML")
+    file_ = gr.Textbox(label="File name" ,value="llama-2-7b-chat.ggmlv3.q5_1.bin")
     max_tokens = gr.inputs.Slider(1, 2048, default=256, label="Max new tokens", step=1)
     temperature = gr.inputs.Slider(0.1, 1., default=0.2, label="Temperature", step=0.1)
     top_k = gr.inputs.Slider(0.01, 1., default=0.95, label="Top K", step=0.01)

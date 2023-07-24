@@ -23,6 +23,9 @@ from langchain.document_loaders import (
     UnstructuredWordDocumentLoader,
     PyPDFLoader,
 )
+import gc
+gc.collect()
+torch.cuda.empty_cache()
 
 #YOUR_HF_TOKEN = os.getenv("My_hf_token")
 llm_api=HuggingFaceHub(
@@ -156,6 +159,11 @@ class DocChat(param.Parameterized):
         if torch.cuda.is_available():
             try:
               model_path = hf_hub_download(repo_id=repo_, filename=file_)
+              
+              self.qa = None
+              self.llm = None
+              gc.collect()
+              torch.cuda.empty_cache()
 
               self.llm = LlamaCpp(
                   model_path=model_path,
@@ -173,10 +181,17 @@ class DocChat(param.Parameterized):
               self.k_value = k
               return f"Loaded {file_} [GPU INFERENCE]"
             except:
-              return "No valid model"
+              self.llm = llm_api[0]
+              self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
+              return "No valid model | Reloaded Falcon"
         else:
             try:
               model_path = hf_hub_download(repo_id=repo_, filename=file_)
+              
+              self.qa = None
+              self.llm = None
+              gc.collect()
+              torch.cuda.empty_cache()
 
               self.llm = LlamaCpp(
                   model_path=model_path,
@@ -193,7 +208,9 @@ class DocChat(param.Parameterized):
               self.k_value = k
               return f"Loaded {file_} [CPU INFERENCE SLOW]"
             except:
-              return "No valid model"
+              self.llm = llm_api[0]
+              self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
+              return "No valid model | Reloaded Falcon"
 
     def default_falcon_model(self):
       self.llm = llm_api[0]

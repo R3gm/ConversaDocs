@@ -1,4 +1,5 @@
 import torch
+import os
 try:
   from llama_cpp import Llama
 except:
@@ -32,8 +33,6 @@ from langchain.document_loaders import (
     PyPDFLoader,
 )
 import param
-import os
-import torch
 from conversadocs.bones import DocChat
 
 dc = DocChat()

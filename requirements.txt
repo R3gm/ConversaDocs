@@ -1,5 +1,4 @@
 transformers
-numpy
 torch
 pypdf
 langchain==0.0.240

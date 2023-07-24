@@ -101,7 +101,7 @@ class DocChat(param.Parameterized):
         super(DocChat, self).__init__( **params)
         self.loaded_file = "demo_docs/demo.txt"
         self.db = load_db(self.loaded_file)
-        self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
+        self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
         self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
         
 
@@ -134,7 +134,7 @@ class DocChat(param.Parameterized):
           result = self.qa({"question": query, "chat_history": self.chat_history})
         except:
           print("Error not get response from model, reloaded default llama-2 7B config")
-          self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
+          self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
           self.qa = q_a(self.db, "stuff", k_max, self.llm)
           result = self.qa({"question": query, "chat_history": self.chat_history})
         
@@ -144,7 +144,7 @@ class DocChat(param.Parameterized):
         self.answer = result['answer']
         return self.answer
 
-    def change_llm(self, repo_, file_, max_tokens=16, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3):
+    def change_llm(self, repo_, file_, max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3):
 
         if torch.cuda.is_available():
             try:
@@ -157,7 +157,7 @@ class DocChat(param.Parameterized):
 
               self.llm = LlamaCpp(
                   model_path=model_path,
-                  n_ctx=1000,
+                  n_ctx=2048,
                   n_batch=512,
                   n_gpu_layers=35,
                   max_tokens=max_tokens,
@@ -171,7 +171,7 @@ class DocChat(param.Parameterized):
               self.k_value = k
               return f"Loaded {file_} [GPU INFERENCE]"
             except:
-              self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
+              self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
               return "No valid model | Reloaded Reloaded default llama-2 7B config"
         else:
             try:
@@ -184,7 +184,7 @@ class DocChat(param.Parameterized):
 
               self.llm = LlamaCpp(
                   model_path=model_path,
-                  n_ctx=1000,
+                  n_ctx=2048,
                   n_batch=8,
                   max_tokens=max_tokens,
                   verbose=False,
@@ -197,7 +197,7 @@ class DocChat(param.Parameterized):
               self.k_value = k
               return f"Loaded {file_} [CPU INFERENCE SLOW]"
             except:
-              self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
+              self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
               return "No valid model | Reloaded default llama-2 7B config"
 
     def default_falcon_model(self, HF_TOKEN):

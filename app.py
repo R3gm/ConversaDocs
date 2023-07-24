@@ -58,6 +58,12 @@ description = """
 
 - Oficial Repository [![a](https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github)](https://github.com/R3gm/ConversaDocs/)
 
+- You can upload multiple documents at once to a single database.
+
+- Every time a new database is created, the previous one is deleted.
+
+- For maximum privacy, you can click "Load LLAMA GGML Model" to use a Llama 2 model. By default, the model llama-2_7B-Chat is loaded.
+
 - This application works on both CPU and GPU. For fast inference with GGML models, use the GPU.
 
 - For more information about what GGML models are, you can visit this notebook [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/R3gm/InsightSolver-Colab/blob/main/LLM_Inference_with_llama_cpp_python__Llama_2_13b_chat.ipynb)
@@ -96,7 +102,7 @@ def clear_api_key(api_key):
 
 
 # Max values in generation
-DOC_DB_LIMIT = 10
+DOC_DB_LIMIT = 5
 MAX_NEW_TOKENS = 2048
 
 # Limit in HF, no need to set it
@@ -124,7 +130,7 @@ with gr.Blocks(theme=theme, css=css) as demo:
         sou = gr.HTML("")
 
     clear_button.click(flag,[],[link_output]).then(dc.clr_history,[], [link_output]).then(lambda: None, None, chatbot, queue=False)
-    upload_button.upload(flag,[],[file_output]).then(upload_file, [upload_button, max_docs], file_output).then(dc.clr_history,[], [link_output]).then(lambda: None, None, chatbot, queue=False)
+    upload_button.upload(flag,[],[file_output]).then(upload_file, [upload_button, max_docs], file_output).then(dc.clr_history,[], [link_output])
     
   with gr.Tab("Config llama-2 model"):
     gr.HTML("<h3>Only models from the GGML library are accepted. To apply the new configurations, please reload the model.</h3>")

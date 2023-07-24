@@ -1,3 +1,4 @@
+import torch
 try:
   from llama_cpp import Llama
 except:

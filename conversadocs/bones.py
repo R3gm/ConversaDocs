@@ -28,17 +28,6 @@ gc.collect()
 torch.cuda.empty_cache()
 
 #YOUR_HF_TOKEN = os.getenv("My_hf_token")
-llm_api=HuggingFaceHub(
-    huggingfacehub_api_token=os.getenv("My_hf_token"),
-    repo_id="tiiuae/falcon-7b-instruct",
-    model_kwargs={
-        "temperature":0.2,
-        "max_new_tokens":500,
-        "top_k":50,
-        "top_p":0.95,
-        "repetition_penalty":1.2,
-        },), #ChatOpenAI(model_name=llm_name, temperature=0)
-
 
 #alter
 def load_db(files):
@@ -105,14 +94,14 @@ class DocChat(param.Parameterized):
     answer = param.String("")
     db_query  = param.String("")
     db_response = param.List([])
-    llm = llm_api[0]
     k_value = param.Integer(3)
-
+    llm = None
 
     def __init__(self,  **params):
         super(DocChat, self).__init__( **params)
         self.loaded_file = "demo_docs/demo.txt"
         self.db = load_db(self.loaded_file)
+        self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
         self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
         
 
@@ -144,7 +133,8 @@ class DocChat(param.Parameterized):
         try:
           result = self.qa({"question": query, "chat_history": self.chat_history})
         except:
-          self.default_falcon_model()
+          print("Error not get response from model, reloaded default llama-2 7B config")
+          self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
           self.qa = q_a(self.db, "stuff", k_max, self.llm)
           result = self.qa({"question": query, "chat_history": self.chat_history})
         
@@ -181,9 +171,8 @@ class DocChat(param.Parameterized):
               self.k_value = k
               return f"Loaded {file_} [GPU INFERENCE]"
             except:
-              self.llm = llm_api[0]
-              self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
-              return "No valid model | Reloaded Falcon"
+              self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
+              return "No valid model | Reloaded Reloaded default llama-2 7B config"
         else:
             try:
               model_path = hf_hub_download(repo_id=repo_, filename=file_)
@@ -208,12 +197,20 @@ class DocChat(param.Parameterized):
               self.k_value = k
               return f"Loaded {file_} [CPU INFERENCE SLOW]"
             except:
-              self.llm = llm_api[0]
-              self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
-              return "No valid model | Reloaded Falcon"
+              self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=16, temperature=0.8, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
+              return "No valid model | Reloaded default llama-2 7B config"
 
-    def default_falcon_model(self):
-      self.llm = llm_api[0]
+    def default_falcon_model(self, HF_TOKEN):
+      self.llm = llm_api=HuggingFaceHub(
+          huggingfacehub_api_token=HF_TOKEN,
+          repo_id="tiiuae/falcon-7b-instruct",
+          model_kwargs={
+              "temperature":0.2,
+              "max_new_tokens":500,
+              "top_k":50,
+              "top_p":0.95,
+              "repetition_penalty":1.2,
+              },)
       self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
       return "Loaded model Falcon 7B-instruct [API FAST INFERENCE]"
 
@@ -221,7 +218,7 @@ class DocChat(param.Parameterized):
         self.llm = ChatOpenAI(temperature=0, openai_api_key=API_KEY, model_name='gpt-3.5-turbo')
         self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
         API_KEY = ""
-        return "Loaded model OpenAI gpt-3.5-turbo [API FAST INFERENCE] | If there is no response from the API, Falcon 7B-instruct will be used."
+        return "Loaded model OpenAI gpt-3.5-turbo [API FAST INFERENCE]"
 
     @param.depends('db_query ', )
     def get_lquest(self):

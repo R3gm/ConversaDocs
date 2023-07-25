@@ -131,7 +131,14 @@ with gr.Blocks(theme=theme, css=css) as demo:
 
     clear_button.click(flag,[],[link_output]).then(dc.clr_history,[], [link_output]).then(lambda: None, None, chatbot, queue=False)
     upload_button.upload(flag,[],[file_output]).then(upload_file, [upload_button, max_docs], file_output).then(dc.clr_history,[], [link_output])
+
+  with gr.Tab("Experimental Summarization"):
+    default_model = gr.HTML("<hr>From DB<br>It may take approximately 5 minutes to complete 15 pages in GPU. Please use files with fewer pages if you want to use summarization.<br></h2>")
+    summarize_button = gr.Button("Start summarization")
     
+    summarize_verify = gr.HTML(" ")
+    summarize_button.click(dc.summarize, [], [summarize_verify])
+
   with gr.Tab("Config llama-2 model"):
     gr.HTML("<h3>Only models from the GGML library are accepted. To apply the new configurations, please reload the model.</h3>")
     repo_ = gr.Textbox(label="Repository" ,value="TheBloke/Llama-2-7B-Chat-GGML")
@@ -158,7 +165,7 @@ with gr.Blocks(theme=theme, css=css) as demo:
     line_ = gr.HTML("<hr> </h2>")
     model_verify = gr.HTML(" ")
 
-  with gr.Tab("About"):
+  with gr.Tab("Help"):
     description_md = gr.Markdown(description)
 
   msg.submit(predict,[msg, chatbot, max_docs, check_memory],[msg, chatbot]).then(convert,[],[sou])

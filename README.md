@@ -1,4 +1,11 @@
 # ConversaDocs
+
+## 🦙 Chat with your documents using Llama 2, Falcon 🦅 or OpenAI 🤖
+
+- 🔒 By default, the model llama2_7B-Chat is loaded for maximum privacy.
+- 📚 You can upload multiple documents at once to a single database.
+- ♻️ Every time a new database is created, the previous one is deleted.
+
 Program that enables seamless interaction with your documents through an advanced vector database and the power of Large Language Model (LLM) technology.
 
 | Description | Link |

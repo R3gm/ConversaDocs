@@ -29,23 +29,22 @@ torch.cuda.empty_cache()
 
 #YOUR_HF_TOKEN = os.getenv("My_hf_token")
 
+EXTENSIONS = {
+    ".txt": (TextLoader, {"encoding": "utf8"}),
+    ".pdf": (PyPDFLoader, {}),
+    ".doc": (UnstructuredWordDocumentLoader, {}),
+    ".docx": (UnstructuredWordDocumentLoader, {}),
+    ".enex": (EverNoteLoader, {}),
+    ".epub": (UnstructuredEPubLoader, {}),
+    ".html": (UnstructuredHTMLLoader, {}),
+    ".md": (UnstructuredMarkdownLoader, {}),
+    ".odt": (UnstructuredODTLoader, {}),
+    ".ppt": (UnstructuredPowerPointLoader, {}),
+    ".pptx": (UnstructuredPowerPointLoader, {}),
+}
+
 #alter
 def load_db(files):
-    EXTENSIONS = {
-        ".txt": (TextLoader, {"encoding": "utf8"}),
-        ".pdf": (PyPDFLoader, {}),
-        ".doc": (UnstructuredWordDocumentLoader, {}),
-        ".docx": (UnstructuredWordDocumentLoader, {}),
-        ".enex": (EverNoteLoader, {}),
-        ".epub": (UnstructuredEPubLoader, {}),
-        ".html": (UnstructuredHTMLLoader, {}),
-        ".md": (UnstructuredMarkdownLoader, {}),
-        ".odt": (UnstructuredODTLoader, {}),
-        ".ppt": (UnstructuredPowerPointLoader, {}),
-        ".pptx": (UnstructuredPowerPointLoader, {}),
-    }
-
-
 
     # select extensions loader
     documents = []
@@ -99,7 +98,7 @@ class DocChat(param.Parameterized):
 
     def __init__(self,  **params):
         super(DocChat, self).__init__( **params)
-        self.loaded_file = "demo_docs/demo.txt"
+        self.loaded_file = ["demo_docs/demo.txt"]
         self.db = load_db(self.loaded_file)
         self.change_llm("TheBloke/Llama-2-7B-Chat-GGML", "llama-2-7b-chat.ggmlv3.q5_1.bin", max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3)
         self.qa = q_a(self.db, "stuff", self.k_value, self.llm)
@@ -144,6 +143,31 @@ class DocChat(param.Parameterized):
         self.answer = result['answer']
         return self.answer
 
+    def summarize(self, chunk_size=2000, chunk_overlap=100):
+        # load docs
+        documents = []
+        for file in self.loaded_file:
+          ext = "." + file.rsplit(".", 1)[-1]
+          if ext in EXTENSIONS:
+              loader_class, loader_args = EXTENSIONS[ext]
+              loader = loader_class(file, **loader_args)
+              documents.extend(loader.load_and_split())
+
+        if documents == []:
+            return "Error in summarization"
+
+        # split documents
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size, 
+            chunk_overlap=chunk_overlap,
+            separators=["\n\n", "\n", "(?<=\. )", " ", ""]
+            )
+        docs = text_splitter.split_documents(documents)
+        # summarize
+        from langchain.chains.summarize import load_summarize_chain
+        chain = load_summarize_chain(self.llm, chain_type='map_reduce', verbose=True)
+        return chain.run(docs)
+
     def change_llm(self, repo_, file_, max_tokens=256, temperature=0.2, top_p=0.95, top_k=50, repeat_penalty=1.2, k=3):
 
         if torch.cuda.is_available():
@@ -157,7 +181,7 @@ class DocChat(param.Parameterized):
 
               self.llm = LlamaCpp(
                   model_path=model_path,
-                  n_ctx=2048,
+                  n_ctx=4096,
                   n_batch=512,
                   n_gpu_layers=35,
                   max_tokens=max_tokens,

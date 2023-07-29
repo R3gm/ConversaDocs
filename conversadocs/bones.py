@@ -7,7 +7,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain import HuggingFaceHub
-from langchain.llms import LlamaCpp
+from conversadocs.llamacppmodels import LlamaCpp #from langchain.llms import LlamaCpp
 from huggingface_hub import hf_hub_download
 import param
 import os
@@ -178,12 +178,13 @@ class DocChat(param.Parameterized):
               self.llm = None
               gc.collect()
               torch.cuda.empty_cache()
+              gpu_llm_layers = 35 if not '70B' in repo_.upper() else 25 # fix for 70B
 
               self.llm = LlamaCpp(
                   model_path=model_path,
                   n_ctx=4096,
                   n_batch=512,
-                  n_gpu_layers=35,
+                  n_gpu_layers=gpu_llm_layers, 
                   max_tokens=max_tokens,
                   verbose=False,
                   temperature=temperature,

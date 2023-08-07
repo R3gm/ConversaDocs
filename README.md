@@ -14,3 +14,11 @@ Program that enables seamless interaction with your documents through an advance
 | 🎉 Repository | [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github)](https://github.com/R3gm/ConversaDocs/) |
 | 🚀 Online inference HF | [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/r3gm/ConversaDocs) |
 
+
+## 📖 News
+
+🔥 2023/07/24: Document summarization was added.
+
+🔥 2023/07/29: Error with llama 70B was fixed.
+
+🔥 2023/08/07: ♟️ Chessboard was added for playing with a LLM.

@@ -14,6 +14,17 @@ Program that enables seamless interaction with your documents through an advance
 | 🎉 Repository | [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github)](https://github.com/R3gm/ConversaDocs/) |
 | 🚀 Online inference HF | [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/r3gm/ConversaDocs) |
 
+### Chat with different formats of documents.
+![image](https://github.com/R3gm/ConversaDocs/assets/114810545/1c6c426f-c144-442e-b71a-07867bdf68d3)
+
+### Summarize.
+
+![image](https://github.com/R3gm/ConversaDocs/assets/114810545/2ded3f4e-a9d6-44db-b73b-b81c0abeeebb)
+
+### Play chess with the LLM.
+![image](https://github.com/R3gm/ConversaDocs/assets/114810545/877a6580-fcf9-4c0c-b0d4-f5eb5e8a6199)
+
+
 
 ## 📖 News
 

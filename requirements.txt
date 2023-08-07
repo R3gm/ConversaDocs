@@ -11,3 +11,4 @@ unstructured[local-inference]
 gradio==3.35.2
 param==1.13.0
 openai
+python-chess==1.999

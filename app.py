@@ -34,8 +34,10 @@ from langchain.document_loaders import (
 )
 import param
 from conversadocs.bones import DocChat
+from conversadocs.llm_chess import ChessGame
 
 dc = DocChat()
+cg  = ChessGame(dc)
 
 ##### GRADIO CONFIG ####
 
@@ -46,7 +48,7 @@ css="""
 title = """
 <div style="text-align: center;max-width: 1500px;">
     <h2>Chat with Documents 📚 - Falcon, Llama-2 and OpenAI</h2>
-    <p style="text-align: center;">Upload txt, pdf, doc, docx, enex, epub, html, md, odt, ptt and pttx. 
+    <p style="text-align: center;">Upload txt, pdf, doc, docx, enex, epub, html, md, odt, ptt and pttx.
     Wait for the Status to show Loaded documents, start typing your questions. Oficial Repository <a href="https://github.com/R3gm/ConversaDocs">ConversaDocs</a>.<br /></p>
 </div>
 """
@@ -67,6 +69,16 @@ description = """
 - This application works on both CPU and GPU. For fast inference with GGML models, use the GPU.
 
 - For more information about what GGML models are, you can visit this notebook [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/R3gm/InsightSolver-Colab/blob/main/LLM_Inference_with_llama_cpp_python__Llama_2_13b_chat.ipynb)
+
+## 📖 News
+
+🔥 2023/07/24: Document summarization was added.
+
+🔥 2023/07/29: Error with llama 70B was fixed.
+
+🔥 2023/08/07: ♟️ Chessboard was added for playing with a LLM.
+
+
 """
 
 theme='aliabid94/new-theme'
@@ -99,7 +111,6 @@ def convert():
 
 def clear_api_key(api_key):
   return 'api_key...', dc.openai_model(api_key)
-
 
 # Max values in generation
 DOC_DB_LIMIT = 5
@@ -135,9 +146,20 @@ with gr.Blocks(theme=theme, css=css) as demo:
   with gr.Tab("Experimental Summarization"):
     default_model = gr.HTML("<hr>From DB<br>It may take approximately 5 minutes to complete 15 pages in GPU. Please use files with fewer pages if you want to use summarization.<br></h2>")
     summarize_button = gr.Button("Start summarization")
-    
+
     summarize_verify = gr.HTML(" ")
     summarize_button.click(dc.summarize, [], [summarize_verify])
+
+  with gr.Tab("♟️ Chess Game with a LLM"):
+    with gr.Column():
+        gr.HTML('♟️ Click to start the Chessboard ♟️')
+        start_chess = gr.Button("START GAME")
+        board_chess = gr.HTML()
+        info_chess = gr.HTML()
+        input_chess = gr.Textbox(label="Type a valid move", placeholder="")
+
+    start_chess.click(cg.start_game,[],[board_chess, info_chess])
+    input_chess.submit(cg.user_move,[input_chess],[board_chess, info_chess, input_chess])
 
   with gr.Tab("Config llama-2 model"):
     gr.HTML("<h3>Only models from the GGML library are accepted. To apply the new configurations, please reload the model.</h3>")
@@ -149,7 +171,7 @@ with gr.Blocks(theme=theme, css=css) as demo:
     top_p = gr.inputs.Slider(0, 100, default=50, label="Top P", step=1)
     repeat_penalty = gr.inputs.Slider(0.1, 100., default=1.2, label="Repeat penalty", step=0.1)
     change_model_button = gr.Button("Load Llama GGML Model")
-    
+
     model_verify_ggml = gr.HTML("Loaded model Llama-2")
 
   with gr.Tab("API Models"):
@@ -174,5 +196,5 @@ with gr.Blocks(theme=theme, css=css) as demo:
 
   falcon_button.click(dc.default_falcon_model, [hf_key], [model_verify])
   openai_button.click(clear_api_key, [api_key], [api_key, model_verify])
-    
-demo.launch(share=True,  enable_queue=True)
+
+demo.launch(debug=True, share=True,  enable_queue=True)

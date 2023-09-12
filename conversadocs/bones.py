@@ -178,7 +178,7 @@ class DocChat(param.Parameterized):
               self.llm = None
               gc.collect()
               torch.cuda.empty_cache()
-              gpu_llm_layers = 35 if not '70B' in repo_.upper() else 25 # fix for 70B
+              gpu_llm_layers = 43 if not '70B' in repo_.upper() else 25 # fix for 70B
 
               self.llm = LlamaCpp(
                   model_path=model_path,
